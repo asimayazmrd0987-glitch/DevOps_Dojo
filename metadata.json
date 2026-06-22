@@ -1,0 +1,6 @@
+{
+  "name": "DevOps Dojo",
+  "description": "An interactive, browser-based ephemeral DevOps learning sandbox containing Linux, Docker, Kubernetes labs with an AI-powered assistant, and terminal evaluations.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
