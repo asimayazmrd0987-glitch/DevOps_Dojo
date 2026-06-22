@@ -15,44 +15,49 @@ function getAiClient(): GoogleGenAI {
   if (!aiClient) {
     const key = process.env.GEMINI_API_KEY;
     if (!key) {
-      console.warn("GEMINI_API_KEY is missing. AI help features will be unavailable.");
+      console.warn(
+        "GEMINI_API_KEY is missing. AI help features will be unavailable.",
+      );
     }
     aiClient = new GoogleGenAI({
       apiKey: key || "MOCK_KEY",
       httpOptions: {
         headers: {
-          'User-Agent': 'aistudio-build',
-        }
-      }
+          "User-Agent": "aistudio-build",
+        },
+      },
     });
   }
   return aiClient;
 }
 
 // REST API for DevOps Coach
-app.post("/api/gemini/mentor", async (req: express.Request, res: express.Response): Promise<void> => {
-  try {
-    const { 
-      messages, 
-      currentLab, 
-      activeStepIndex, 
-      terminalHistory, 
-      virtualFilesystem, 
-      currentPath 
-    } = req.body;
+app.post(
+  "/api/gemini/mentor",
+  async (req: express.Request, res: express.Response): Promise<void> => {
+    try {
+      const {
+        messages,
+        currentLab,
+        activeStepIndex,
+        terminalHistory,
+        virtualFilesystem,
+        currentPath,
+      } = req.body;
 
-    const apiKey = process.env.GEMINI_API_KEY;
-    if (!apiKey) {
-      res.status(500).json({ 
-        error: "GEMINI_API_KEY is not configured. Please add it to your secrets or environment configuration." 
-      });
-      return;
-    }
+      const apiKey = process.env.GEMINI_API_KEY;
+      if (!apiKey) {
+        res.status(500).json({
+          error:
+            "GEMINI_API_KEY is not configured. Please add it to your secrets or environment configuration.",
+        });
+        return;
+      }
 
-    const ai = getAiClient();
-    
-    // Prepare the layout description
-    const systemInstruction = `You are DevOpsSensei, a supportive, highly experienced, and playful DevOps tutor helping the student learn technologies like Linux command lines, Docker containers, Kubernetes, and CI/CD.
+      const ai = getAiClient();
+
+      // Prepare the layout description
+      const systemInstruction = `You are DevOpsSensei, a supportive, highly experienced, and playful DevOps tutor helping the student learn technologies like Linux command lines, Docker containers, Kubernetes, and CI/CD.
 Your student is currently using "DevOps Dojo", a browser-based interactive learning terminal.
 Current context of student workspace:
 - Active Lab: ${currentLab ? `${currentLab.title} (Difficulty: ${currentLab.difficulty})` : "Exploring Sandbox"}
@@ -68,31 +73,41 @@ Guidelines for responding:
 3. Be clean, concise, and highly professional. Avoid long blocks of text. Use code blocks for terminal commands or yaml specs.
 4. If they ask about unrelated stuff, politely redirect them back to gaining top DevOps masteries.`;
 
-    const chatContent = messages.map((m: any) => ({
-      role: m.role === "assistant" ? "model" as const : "user" as const,
-      parts: [{ text: m.content }]
-    }));
+      const chatContent = messages.map((m: any) => ({
+        role: m.role === "assistant" ? ("model" as const) : ("user" as const),
+        parts: [{ text: m.content }],
+      }));
 
-    // Trigger gemini-3.5-flash for general chat tasks
-    const response = await ai.models.generateContent({
-      model: "gemini-3.5-flash",
-      contents: chatContent,
-      config: {
-        systemInstruction,
-        temperature: 0.7,
-      }
-    });
+      // Trigger gemini-3.5-flash for general chat tasks
+      const response = await ai.models.generateContent({
+        model: "gemini-1.5-flash",
+        contents: chatContent,
+        config: {
+          systemInstruction,
+          temperature: 0.7,
+        },
+      });
 
-    res.json({ text: response.text });
-  } catch (error: any) {
-    console.error("Gemini coach error:", error);
-    res.status(500).json({ error: error.message || "An error occurred with the AI Mentor connection." });
-  }
-});
+      res.json({ text: response.text });
+    } catch (error: any) {
+      console.error("Gemini coach error:", error);
+      res
+        .status(500)
+        .json({
+          error:
+            error.message || "An error occurred with the AI Mentor connection.",
+        });
+    }
+  },
+);
 
 // Port ping or simulation checks
 app.get("/api/health", (req, res) => {
-  res.json({ status: "ready", platform: "DevOps Dojo Sandbox Server", time: new Date() });
+  res.json({
+    status: "ready",
+    platform: "DevOps Dojo Sandbox Server",
+    time: new Date(),
+  });
 });
 
 async function startServer() {
