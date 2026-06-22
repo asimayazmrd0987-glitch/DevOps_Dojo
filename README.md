@@ -23,8 +23,7 @@
 
 ## 🚀 Live Demo
 
-> Coming soon — deploy to Vercel/Render and share the link.
-
+dev-ops-dojo.vercel.app
 ---
 
 ## 📸 Preview
@@ -33,7 +32,7 @@
 ┌─────────────────────────────────────────────────────────────┐
 │  DevOps Dojo                                    [Terminal]  │
 │                                                             │
-│  🥋 Welcome to Linux Basics                               │
+│  🥋 Welcome to Linux Basics                                 │
 │                                                             │
 │  Step 3/8: Create a directory and navigate into it          │
 │                                                             │
